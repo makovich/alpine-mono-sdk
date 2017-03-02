@@ -1,5 +1,19 @@
 FROM alpine:3.5
 
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VERSION
+
+LABEL org.label-schema.build-date="$BUILD_DATE" \
+      org.label-schema.name="alpine-mono-sdk" \
+      org.label-schema.description="The Build Container pattern base: Alpine Linux 3.5, Mono built against musl, NuGet and Paket." \
+      org.label-schema.url="https://github.com/makovich/alpine-mono-sdk" \
+      org.label-schema.vcs-ref="$VCS_REF" \
+      org.label-schema.vcs-url="https://github.com/makovich/alpine-mono-sdk" \
+      org.label-schema.version="$VERSION" \
+      org.label-schema.schema-version="1.0" \
+      org.label-schema.docker.cmd.debug="docker run --rm -ti --cap-add=SYS_PTRACE /bin/sh"
+
 RUN apk add --no-cache \
         alpine-sdk \
         linux-headers \
@@ -9,7 +23,10 @@ RUN apk add --no-cache \
         cmake \
         libtool \
         gettext-dev \
-        zlib-dev
+        zlib-dev \
+        strace \
+        lsof \
+        htop
 
 ENV MONO_VERSION 4.8.0.495
 ENV PAKET_VERSION 3.35.3

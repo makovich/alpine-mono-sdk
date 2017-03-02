@@ -1,0 +1,12 @@
+#!/bin/bash
+
+BUILD_SHA=`git rev-parse --short HEAD`
+BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
+VERSION=$DOCKER_TAG
+
+echo "Build ARGs: IMAGE_NAME=$IMAGE_NAME; BUILD_SHA=$BUILD_SHA; BUILD_DATE=$BUILD_DATE"
+
+docker build --build-arg BUILD_DATE=$BUILD_DATE \
+             --build-arg VCS_REF=$BUILD_SHA \
+             --build-arg VERSION=$VERSION \
+             -t $IMAGE_NAME .
