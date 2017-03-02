@@ -1,0 +1,40 @@
+diff --git a/mcs/tools/mkbundle/mkbundle.cs b/mcs/tools/mkbundle/mkbundle.cs
+index 603af94..237c920 100755
+--- a/mcs/tools/mkbundle/mkbundle.cs
++++ b/mcs/tools/mkbundle/mkbundle.cs
+@@ -1155,11 +1155,13 @@ void          mono_register_config_for_assembly (const char* assembly_name, cons
+ 		if (!autodeps)
+ 			return true;
+ 		try {
+-			Assembly a = universe.LoadFile (path);
++			Assembly root = universe.LoadFile (path);
+ 
+-			foreach (AssemblyName an in a.GetReferencedAssemblies ()) {
+-				LoadAssembly (an.FullName);
+-				if (!QueueAssembly (files, a.CodeBase))
++			foreach (AssemblyName rootDependency in root.GetReferencedAssemblies ()) {
++				var locatedDependency = LoadAssembly (rootDependency.Name);
++				if (locatedDependency == null)
++					continue;
++				if (!QueueAssembly (files, locatedDependency.CodeBase))
+ 					return false;
+ 			}
+ 		} catch (Exception) {
+@@ -1205,6 +1207,8 @@ void          mono_register_config_for_assembly (const char* assembly_name, cons
+ 				full_path += ".dll";
+ 			
+ 			try {
++				if (!quiet)
++					Console.WriteLine($"     Probing: {full_path}");
+ 				var a = universe.LoadFile (full_path);
+ 				return a;
+ 			} catch (FileNotFoundException ff) {
+@@ -1212,7 +1216,7 @@ void          mono_register_config_for_assembly (const char* assembly_name, cons
+ 				continue;
+ 			}
+ 		}
+-		if (!quiet)
++		if (!quiet && !string.IsNullOrWhiteSpace(total_log))
+ 			Console.WriteLine ("Log: \n" + total_log);
+ 		return null;
+ 	}
